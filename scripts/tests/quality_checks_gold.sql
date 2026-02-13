@@ -148,3 +148,50 @@ sls_sales <= 0 or sls_quantity <= 0 or sls_price <= 0
 order by sls_sales, sls_quantity, sls_price
 
 --------------- End of Quality check queries for bronze layer crm_sales_details table ---------------
+
+--------------- Start of Quality check queries for bronze layer erp_cust_az12 table ---------------
+
+-- check for invalid dates
+select bdate from bronze.erp_cust_az12
+where bdate < '1925-01-01' or bdate > GETDATE()
+
+-- data standardization and normalization
+select distinct gen, 
+case when upper(trim(gen)) in  ('F', 'FEMALE') then 'Female'
+	when upper(trim(gen)) in ('M', 'MALE') then 'Male'
+	else 'NA'
+end as gen
+from bronze.erp_cust_az12
+
+--------------- End of Quality check queries for bronze layer erp_cust_az12 table ---------------
+
+--------------- Start of Quality check queries for bronze layer erp_loc_a101 table ---------------
+
+-- data standardization and consistency
+select distinct cntry
+from bronze.erp_loc_a101
+
+--------------- End of Quality check queries for bronze layer erp_loc_a101 table ---------------
+
+--------------- Start of Quality check queries for bronze layer erp_px_cat_g1v2 table ---------------
+
+-- check for unwanted spaces, data consistency and normalization
+
+select * from bronze.erp_px_cat_g1v2
+where id != trim(id)
+
+
+select * from bronze.erp_px_cat_g1v2
+where cat != trim(cat)
+
+select distinct cat from bronze.erp_px_cat_g1v2
+
+select * from bronze.erp_px_cat_g1v2
+where subcat != trim(subcat)
+
+select distinct subcat from bronze.erp_px_cat_g1v2
+
+select * from bronze.erp_px_cat_g1v2
+where maintenance != trim(maintenance)
+
+--------------- End of Quality check queries for bronze layer erp_px_cat_g1v2 table ---------------
