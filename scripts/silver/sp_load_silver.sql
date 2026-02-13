@@ -1,9 +1,9 @@
 create or alter procedure silver.load_silver as
 begin
 	begin try
-		declare @start_time_bronze datetime, @end_time_bronze datetime, @start_time datetime, @end_time datetime
+		declare @start_time_silver datetime, @end_time_silver datetime, @start_time datetime, @end_time datetime
 
-		set @start_time_bronze = GETDATE()
+		set @start_time_silver = GETDATE()
 		print '=============================================================';
 		print '               Loading Silver Layer Started';
 		print '=============================================================';
@@ -132,14 +132,91 @@ begin
 		set @end_time = GETDATE()
 		print '>>> Load Duration: ' + cast(datediff(second, @start_time, @end_time) as nvarchar) + ' seconds'
 
+		print '--------------------------------';
+		print 'Loading ERP Table: erp_cust_az12';
+		print '--------------------------------';
 
+		set @start_time = GETDATE()
+		print '>>> Truncating Table: erp_cust_az12';
+		truncate table silver.erp_cust_az12
 
+		print '>>> Inserting data into Table: erp_cust_az12';
+		insert into silver.erp_cust_az12(
+			cid,
+			bdate,
+			gen
+		)
+		select
+		case when cid like 'NAS%' then substring(trim(cid), 4, len(trim(cid)))
+			else cid
+		end as cid,
+		case when bdate > GETDATE() then null
+			else bdate
+		end as bdate,
+		case when upper(trim(gen)) in  ('F', 'FEMALE') then 'Female'
+			when upper(trim(gen)) in ('M', 'MALE') then 'Male'
+			else 'NA'
+		end as gen
+		from bronze.erp_cust_az12 
 
-		set @end_time_bronze = GETDATE()
+		set @end_time = GETDATE()
+		print '>>> Load Duration: ' + cast(datediff(second, @start_time, @end_time) as nvarchar) + ' seconds'
+
+		print '--------------------------------';
+		print 'Loading ERP Table: erp_loc_a101';
+		print '--------------------------------';
+
+		set @start_time = GETDATE()
+		print '>>> Truncating Table: erp_loc_a101';
+		truncate table silver.erp_loc_a101
+
+		print '>>> Inserting data into Table: erp_loc_a101';
+		insert into silver.erp_loc_a101(
+			cid,
+			cntry
+		)
+		select 
+		replace(trim(cid),'-','') as cid,
+		case when upper(trim(cntry)) = 'DE' then 'Germany'
+			 when upper(trim(cntry)) in ('US', 'USA') then 'United States'
+			 when trim(cntry) = '' or cntry is null then 'NA'
+			 else trim(cntry)
+		end as cntry
+		from bronze.erp_loc_a101 
+
+		set @end_time = GETDATE()
+		print '>>> Load Duration: ' + cast(datediff(second, @start_time, @end_time) as nvarchar) + ' seconds'
+
+		print '--------------------------------';
+		print 'Loading ERP Table: erp_px_cat_g1v2';
+		print '--------------------------------';
+
+		set @start_time = GETDATE()
+		print '>>> Truncating Table: erp_px_cat_g1v2';
+		truncate table silver.erp_px_cat_g1v2
+
+		print '>>> Inserting data into Table: erp_px_cat_g1v2';
+		insert into silver.erp_px_cat_g1v2(
+			id,
+			cat,
+			subcat,
+			maintenance
+		)
+		select 
+		trim(id),
+		trim(cat), 
+		trim(subcat), 
+		trim(maintenance) 
+		from bronze.erp_px_cat_g1v2
+		
+		set @end_time = GETDATE()
+		print '>>> Load Duration: ' + cast(datediff(second, @start_time, @end_time) as nvarchar) + ' seconds'
+
+		set @end_time_silver = GETDATE()
 		print '=============================================================';
 		print '               Loading Silver Layer Completed';
 		print '=============================================================';
-		print '>>> Load Duration for Silver Layer: ' + cast(datediff(second, @start_time_bronze, @end_time_bronze) as nvarchar) + ' seconds'
+		print '>>> Load Duration for Silver Layer: ' + cast(datediff(second, @start_time_silver, @end_time_silver) as nvarchar) + ' seconds'
 
 	end try
 	
