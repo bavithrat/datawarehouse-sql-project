@@ -107,3 +107,47 @@ order by sls_sales, sls_quantity, sls_price
 select * FROM silver.crm_sales_details
 
 --------------- End of Quality check queries for silver layer crm_sales_details table ---------------
+
+--------------- Start of Quality check queries for silver layer erp_cust_az12 table ---------------
+
+-- check for invalid dates
+select bdate from silver.erp_cust_az12
+where bdate < '1925-01-01' or bdate > GETDATE()
+
+-- data standardization and normalization
+select distinct gen
+from silver.erp_cust_az12
+
+--------------- End of Quality check queries for silver layer erp_cust_az12 table ---------------
+
+--------------- Start of Quality check queries for silver layer erp_loc_a101 table ---------------
+
+-- data standardization and consistency
+select distinct cntry
+from silver.erp_loc_a101
+
+select * from silver.erp_loc_a101
+
+--------------- End of Quality check queries for silver layer erp_loc_a101 table ---------------
+
+--------------- Start of Quality check queries for silver layer erp_px_cat_g1v2 table ---------------
+
+-- check for unwanted spaces, data consistency and normalization
+
+select * from silver.erp_px_cat_g1v2
+where id != trim(id)
+
+select * from silver.erp_px_cat_g1v2
+where cat != trim(cat)
+
+select distinct cat from silver.erp_px_cat_g1v2
+
+select * from silver.erp_px_cat_g1v2
+where subcat != trim(subcat)
+
+select distinct subcat from silver.erp_px_cat_g1v2
+
+select * from silver.erp_px_cat_g1v2
+where maintenance != trim(maintenance)
+
+--------------- End of Quality check queries for silver layer erp_px_cat_g1v2 table ---------------
