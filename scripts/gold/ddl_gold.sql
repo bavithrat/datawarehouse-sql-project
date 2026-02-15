@@ -32,7 +32,8 @@ ci.cst_marital_status as marital_status,
 case when ci.cst_gndr != 'NA' then ci.cst_gndr
 	 else coalesce(ca.gen, 'NA')
 end as gender,
-ca.bdate as birth_date
+ca.bdate as birth_date,
+ci.cst_create_date as create_date
 from silver.crm_cust_info ci
 left join silver.erp_cust_az12 ca
 on ca.cid = ci.cst_key
@@ -55,7 +56,7 @@ pi.prd_nm as product_name,
 pi.cat_id as category_id,
 pc.cat as category,
 pc.subcat as sub_category,
-pc.maintenance as maintenance,
+pc.maintenance as maintenance_required,
 pi.prd_cost as product_cost,
 pi.prd_line as product_line,
 pi.prd_start_dt as start_date
@@ -87,14 +88,4 @@ left join gold.dim_customers c
 on c.customer_id = sd.sls_cust_id
 left join gold.dim_products p
 on p.product_number = sd.sls_prd_key
-
-select * from gold.fact_sales
-order by quantity desc
-
-select * from gold.fact_sales s
-left join gold.dim_customers c
-on s.customer_key = c.customer_key
-left join gold.dim_products p
-on s.product_key = p.product_key
-where p.product_key is null
 
