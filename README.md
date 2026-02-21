@@ -97,7 +97,7 @@ datawarehouse-sql-project/
 
 This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and share this project with proper attribution.
 
-## 🌟 Acknowledement
+## 🌟 Acknowledgement
 This project is based on building a Datawarehouse from Youtube content creator Baraa Khatib Salkini.
 The datasets and project guidance were provided by the original creator.
 This repository represents my implementation and understanding of the concepts.
